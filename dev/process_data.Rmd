@@ -1,0 +1,25 @@
+---
+title: "Process Data"
+---
+
+## 1. Load Packages
+
+```{r}
+library(tidyverse)
+library(lubridate)
+library(here)
+library(tigris)
+library(sf)
+library(devtools)
+```
+
+```{r}
+states <- readr::read_csv(file.path(here::here(), 'data/states.csv'))
+```
+
+```{r}
+congressional_district_data <- map(states$State, congressional_districts)
+names(congressional_district_data) <- states$State
+saveRDS(congressional_district_data, file.path(here::here(), 'data/congressional_district_data.rds'))
+```
+
