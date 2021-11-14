@@ -1,6 +1,6 @@
 # Visualizing US House Election Results
 
-## Examples
+## Examples 1: Two-party Vote Changes in West Virginia from 1976 to 2020
 
 ```r
 p <- plots_two_party_spreads(congressional_votes_total, 'West Virginia')
@@ -10,3 +10,14 @@ print(p)
 ```
 
 <img src="fig/WV_congressional_changes.png" alt="drawing" width="700"/>
+
+## Examples 2: Two-party Vote Changes in New York from 1976 to 2020
+
+```r
+p <- plot_vote_shares(congressional_votes_total, 'New York')
+p <- p +
+  theme(text = element_text(size = 7.5))
+print(p)
+```
+
+<img src="fig/NY_congressional_DR_shares.png" alt="drawing" width="700"/>
