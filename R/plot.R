@@ -7,7 +7,7 @@
 #' @export
 plot_vote_shares <- function(vote_df, chosen_state) {
   
-  vote_df %>% 
+  p <- vote_df %>% 
     filter(state == toupper(chosen_state)) %>% 
     select(year, district, DEMOCRAT_PRCT_TW, REPUBLICAN_PRCT_TW) %>% 
     gather(key = PRCT_TYPE, value = VALUE, -year, -district) %>% 
@@ -21,6 +21,8 @@ plot_vote_shares <- function(vote_df, chosen_state) {
     scale_y_continuous(labels = scales::percent) +
     geom_hline(yintercept = 0.5, linetype = 'longdash', color = 'black', size = 0.5) +
     ggtitle(glue('Vote share between Democrats and Republicans - {chosen_state}'))
+  
+  p
 }
 
 #' Plot Two-party Spreads
@@ -37,9 +39,11 @@ plots_two_party_spreads <- function(vote_df, chosen_state, start_year = 1976, en
   years <- seq(start_year, end_year, 2)
   plots <- map(years, get_two_party_spread_plots, vote_df, chosen_state)
   
-  plot_grid(plotlist = plots,
-            labels = years,
-            ncol = 3)
+  p <- plot_grid(plotlist = plots,
+                labels = years,
+                ncol = 3)
+  
+  p
 }
 
 #' Get filtered congressional result data
