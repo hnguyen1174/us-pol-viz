@@ -20,4 +20,4 @@ p <- p +
 print(p)
 ```
 
-<img src="fig/NY_congressional_DR_shares.png" alt="drawing" width="700"/>
+<img src="fig/NY_congressional_DR_shares.png" alt="drawing" width="900"/>
