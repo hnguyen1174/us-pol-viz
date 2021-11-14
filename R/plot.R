@@ -34,10 +34,10 @@ plot_vote_shares <- function(vote_df, chosen_state) {
 #'
 #' @return NULL
 #' @export
-plots_two_party_spreads <- function(vote_df, chosen_state, start_year = 1976, end_year = 2020) {
+plots_two_party_spreads <- function(vote_df, chosen_state, start_year = 1976, end_year = 2020, tooltips = TRUE) {
   
   years <- seq(start_year, end_year, 2)
-  plots <- map(years, get_two_party_spread_plots, vote_df, chosen_state)
+  plots <- map(years, get_two_party_spread_plots, vote_df, chosen_state, tooltips)
   
   p <- plot_grid(plotlist = plots,
                 labels = years,
@@ -73,7 +73,7 @@ get_filtered_congress_data <- function(vote_df, chosen_state, chosen_year) {
 #'
 #' @return plots
 #' @export
-get_two_party_spread_plots <- function(chosen_year, vote_data, chosen_state) {
+get_two_party_spread_plots <- function(chosen_year, vote_data, chosen_state, tooltips = TRUE) {
   
   mybreaks <- c(-1, seq(-0.1750, -0.025, by = 0.025), -0.0001, 0, 0.0001, seq(0.025, 0.1750, by = 0.025), 1)
   new_breaks <- seq(mybreaks[1], mybreaks[length(mybreaks)], sect_x(mybreaks))
@@ -98,9 +98,12 @@ get_two_party_spread_plots <- function(chosen_year, vote_data, chosen_state) {
       guide = guide_colourbar(frame.colour = 'black', 
                               ticks.colour = 'black',
                               barwidth = 20)
-    ) +
-    geom_sf_label_repel(aes(label = paste0('CD ', DISTRICT, ': ', scales::percent(SPREAD_DR_TW, 0.01))))
-  
+    )
+    
+    if (tooltips) {
+      p <- p + geom_sf_label_repel(aes(label = paste0('CD ', DISTRICT, ': ', scales::percent(SPREAD_DR_TW, 0.01))))
+    }
+    
   p
 }
 
