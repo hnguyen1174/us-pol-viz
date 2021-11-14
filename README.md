@@ -5,6 +5,15 @@
 ## Examples 1: Two-party Vote Changes in West Virginia from 1976 to 2020
 
 ```r
+library(tidyverse)
+library(sf)
+library(devtools)
+
+devtools::load_all()
+congressional_votes_total <- get_congressional_vote_data()
+```
+
+```r
 p <- plots_two_party_spreads(congressional_votes_total, 'West Virginia')
 p <- p +
   theme(text = element_text(size = 7.5))
