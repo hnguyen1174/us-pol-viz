@@ -29,7 +29,7 @@ p <- p +
 print(p)
 ```
 
-<img src="fig/CO_congressional_changes.png" alt="drawing" width="700"/>
+<img src="fig/CO_congressional_changes.jpg" alt="drawing" width="700"/>
 
 ## Examples 3: Two-party Vote Changes in New York from 1976 to 2020
 
