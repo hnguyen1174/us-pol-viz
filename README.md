@@ -32,3 +32,8 @@ print(p)
 ```
 
 <img src="fig/NY_congressional_DR_shares.png" alt="drawing" width="900"/>
+
+## Sources:
+
+* Vote Data - MIT Election lab: https://electionlab.mit.edu/ 
+* Shape files - UCLA PoliSci: https://cdmaps.polisci.ucla.edu/
