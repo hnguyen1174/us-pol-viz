@@ -25,7 +25,7 @@ print(p)
 ## Examples 2: Two-party Vote Changes in Colorado from 1976 to 2020 (shifting from Republican to Democratic)
 
 ```r
-p <- plots_two_party_spreads(congressional_votes_total, 'Colorado')
+p <- plots_two_party_spreads(congressional_votes_total, 'Colorado', tooltips = FALSE)
 p <- p +
   theme(text = element_text(size = 7.5))
 print(p)
