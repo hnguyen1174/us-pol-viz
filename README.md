@@ -20,6 +20,8 @@ p <- p +
 print(p)
 ```
 
+<img src="fig/WV_congressional_changes.png" alt="drawing" width="700"/>
+
 ## Examples 2: Two-party Vote Changes in Colorado from 1976 to 2020 (shifting from Republican to Democratic)
 
 ```r
