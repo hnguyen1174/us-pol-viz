@@ -144,7 +144,11 @@ get_congress_number <- function(election_year) {
     congress_num <- 114
   }
   
-  congress_num
+  if (congress_num < 114) {
+    return(congress_num + 1)
+  } else {
+    congress_num
+  }
 }
 
 #' Get Congressional Map by Election Year

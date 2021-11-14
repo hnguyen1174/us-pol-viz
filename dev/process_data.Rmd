@@ -26,7 +26,7 @@ congressional_votes_total <- get_congressional_vote_data()
 ## 2. Visualizing House Results from 1976 to 2020 by States
 
 ```{r fig.height = 27, fig.width = 10}
-p <- plots_two_party_spreads(congressional_votes_total, 'West Virginia', tooltips = TRUE)
+p <- plots_two_party_spreads(congressional_votes_total, 'Colorado', tooltips = FALSE)
 p <- p +
   theme(text = element_text(size = 7.5))
 print(p)
