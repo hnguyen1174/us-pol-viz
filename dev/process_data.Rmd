@@ -1,25 +1,46 @@
 ---
-title: "Process Data"
+title: "Exploration"
 ---
 
-## 1. Load Packages
+## 1. Load Packages and Data
 
-```{r}
+```{r load_packages}
 library(tidyverse)
 library(lubridate)
 library(here)
 library(tigris)
 library(sf)
 library(devtools)
+library(cowplot)
+library(ggthemes)
+library(ggsflabel)
+library(glue)
+
+devtools::load_all()
 ```
 
-```{r}
-states <- readr::read_csv(file.path(here::here(), 'data/states.csv'))
+```{r get_data}
+congressional_votes_total <- get_congressional_vote_data()
 ```
 
-```{r}
-congressional_district_data <- map(states$State, congressional_districts)
-names(congressional_district_data) <- states$State
-saveRDS(congressional_district_data, file.path(here::here(), 'data/congressional_district_data.rds'))
+## 2. Visualizing House Results from 1976 to 2020 by States
+
+```{r fig.height = 27, fig.width = 10}
+plots_two_party_spreads(congressional_votes_total, 'West Virginia')
 ```
+
+```{r fig.height = 7, fig.width = 9}
+plot_vote_shares(congressional_votes_total, 'Ohio')
+```
+
+
+
+
+
+
+
+
+
+
+
 
