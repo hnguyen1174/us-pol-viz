@@ -8,7 +8,8 @@ plots_two_party_spreads(
   vote_df,
   chosen_state,
   start_year = 1976,
-  end_year = 2020
+  end_year = 2020,
+  tooltips = TRUE
 )
 }
 \arguments{

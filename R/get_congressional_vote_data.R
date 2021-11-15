@@ -48,6 +48,14 @@ get_congressional_vote_data <- function(re_process = FALSE) {
     congressional_votes <- readr::read_csv(file.path(here::here(), 'data/processed_congressional_votes.csv'))
   }
   
+  # Checking ------------------------------------
+  test <- congressional_votes %>% 
+    group_by(year, state, district) %>% 
+    tally() %>% 
+    ungroup() %>% filter(n > 1)
+  
+  if (nrow(test) > 1) stop('An error has occurred.')
+  
   congressional_votes
 }
 
@@ -58,4 +66,25 @@ get_congressional_vote_data <- function(re_process = FALSE) {
 get_states_info <- function() {
   states <- readr::read_csv(file.path(here::here(), 'data/states.csv'))
   states
+}
+
+#' Get Generic Ballot Data
+#'
+#' @param vote_df vote data
+#'
+#' @return generic ballot data
+#' @export
+get_generic_ballot_data <- function(vote_df) {
+  generic_ballot_data <- vote_df %>% 
+    group_by(year, state, state_po) %>% 
+    summarize(totalvotes_generic_ballot = sum(totalvotes),
+              democrat_generic_ballot = sum(DEMOCRAT),
+              republican_generic_ballot = sum(REPUBLICAN),
+              total_democrat_republican = democrat_generic_ballot + republican_generic_ballot,
+              democrat_generic_prct_tw = democrat_generic_ballot/total_democrat_republican,
+              republican_generic_prct_tw = republican_generic_ballot/total_democrat_republican,
+              generic_dr_spread_tw = democrat_generic_prct_tw - republican_generic_prct_tw) %>% 
+    ungroup()
+  
+  generic_ballot_data
 }

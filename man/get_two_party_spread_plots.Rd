@@ -4,7 +4,12 @@
 \alias{get_two_party_spread_plots}
 \title{Get Plots}
 \usage{
-get_two_party_spread_plots(chosen_year, vote_data, chosen_state)
+get_two_party_spread_plots(
+  chosen_year,
+  vote_data,
+  chosen_state,
+  tooltips = TRUE
+)
 }
 \arguments{
 \item{chosen_year}{a chosen year}

@@ -31,13 +31,16 @@ plot_vote_shares <- function(vote_df, chosen_state) {
 #' @param start_year election start year
 #' @param end_year election end year
 #' @param vote_df vote data
+#' @param tooltips tooltip
+#' @param fill_var fill variable
 #'
 #' @return NULL
 #' @export
-plots_two_party_spreads <- function(vote_df, chosen_state, start_year = 1976, end_year = 2020, tooltips = TRUE) {
+plots_two_party_spreads <- function(vote_df, chosen_state, start_year = 1976, end_year = 2020, 
+                                    tooltips = TRUE, fill_var = 'SPREAD_DR_TW') {
   
   years <- seq(start_year, end_year, 2)
-  plots <- map(years, get_two_party_spread_plots, vote_df, chosen_state, tooltips)
+  plots <- map(years, get_two_party_spread_plots, vote_df, chosen_state, tooltips, fill_var = fill_var)
   
   p <- plot_grid(plotlist = plots,
                 labels = years,
@@ -73,9 +76,9 @@ get_filtered_congress_data <- function(vote_df, chosen_state, chosen_year) {
 #'
 #' @return plots
 #' @export
-get_two_party_spread_plots <- function(chosen_year, vote_data, chosen_state, tooltips = TRUE) {
+get_two_party_spread_plots <- function(chosen_year, vote_data, chosen_state, tooltips = TRUE, fill_var = 'SPREAD_DR_TW') {
   
-  mybreaks <- c(-1, seq(-0.1750, -0.025, by = 0.025), -0.0001, 0, 0.0001, seq(0.025, 0.1750, by = 0.025), 1)
+  mybreaks <- c(-1.5, seq(-0.1750, -0.025, by = 0.025), -0.0001, 0, 0.0001, seq(0.025, 0.1750, by = 0.025), 1.5)
   new_breaks <- seq(mybreaks[1], mybreaks[length(mybreaks)], sect_x(mybreaks))
   my_lims <- c(mybreaks[1], mybreaks[length(mybreaks)])
   rep_times <- (diff(mybreaks)[!is.na(diff(mybreaks))])/sect_x(mybreaks)
@@ -87,7 +90,7 @@ get_two_party_spread_plots <- function(chosen_year, vote_data, chosen_state, too
     filter(STATENAME == chosen_state) %>% 
     left_join(vote_data_prc, by = c('DISTRICT' = 'district')) %>% 
     ggplot() +
-    geom_sf(aes(fill = SPREAD_DR_TW)) +
+    geom_sf(aes(fill = !!as.name(fill_var))) +
     theme_bw() +
     theme(legend.position = 'none') +
     scale_fill_discrete_gradient(
@@ -101,7 +104,7 @@ get_two_party_spread_plots <- function(chosen_year, vote_data, chosen_state, too
     )
     
     if (tooltips) {
-      p <- p + geom_sf_label_repel(aes(label = paste0('CD ', DISTRICT, ': ', scales::percent(SPREAD_DR_TW, 0.01))))
+      p <- p + geom_sf_label_repel(aes(label = paste0('CD ', DISTRICT, ': ', scales::percent(!!as.name(fill_var), 0.01))))
     }
     
   p
@@ -161,4 +164,92 @@ get_congress_map_by_year <- function(year) {
   
   congress_num <- get_congress_number(year)
   get_congress_map(cong = congress_num)
+}
+
+#' Get State Names based on Region
+#'
+#' @param region 
+#'
+#' @return state names
+#' @export
+get_states <- function(region) {
+  if (region == 'Western') {
+    return(c(
+      'WA', 'CA', 'OR', 'NV', 'AZ', 'ID', 'UT',
+      'CO', 'WY', 'MT', 'NM'
+    )) 
+  } else if (region == 'Midwest') {
+    return(c(
+      'ND', 'SD', 'NE', 
+      'KS', 'MN', 'IA', 
+      'MO', 'WI', 'MI', 
+      'IL', 'IN', 'OH'
+    )) 
+  } else if (region == 'Northeast') {
+    return(c(
+      'PA', 'NJ', 'NY',
+      'CT', 'RI', 'MA',
+      'VT', 'NH', 'ME'
+    )) 
+  } else if (region == 'Southern') {
+    return(c(
+      'TX', 'OK', 'AR', 'LA',
+      'KY', 'TN', 'MS', 'AL'
+    ))
+  } else if (region == 'South Atlantic') {
+    return(c(
+      'WV', 'VA', 'DC', 'DE', 'MD',
+      'NC', 'SC', 'GA', 'FL'
+    ))
+  } else if (region == 'Hawaii') {
+    return('HI')
+  } else if (region == 'Alaska') {
+    return('AK')
+  }
+}
+
+#' Get Plots for Generic Ballot
+#'
+#' @param chosen_year chosen year
+#' @param vote_data vote data
+#' @param chosen_region chosen region
+#' @param tooltips tooltip
+#' @param fill_var fill variable
+#'
+#' @return generic ballot plot
+#' @export
+get_two_party_genericbal_plots <- function(chosen_year, vote_data, chosen_region, 
+                                           tooltips = TRUE, fill_var = 'generic_dr_spread_tw') {
+  
+  mybreaks <- c(-1.5, seq(-0.1750, -0.025, by = 0.025), -0.0001, 0, 0.0001, seq(0.025, 0.1750, by = 0.025), 1.5)
+  new_breaks <- seq(mybreaks[1], mybreaks[length(mybreaks)], sect_x(mybreaks))
+  my_lims <- c(mybreaks[1], mybreaks[length(mybreaks)])
+  rep_times <- (diff(mybreaks)[!is.na(diff(mybreaks))])/sect_x(mybreaks)
+  mycols <- c(rev(RColorBrewer::brewer.pal(9, 'Reds')), '#FFFFFF', RColorBrewer::brewer.pal(9, 'Blues'))
+  
+  vote_data_prc <- vote_data %>% 
+    filter(year == chosen_year)
+  
+  p <- tigris::states() %>% 
+    filter(STUSPS %in% get_states(chosen_region)) %>% 
+    left_join(vote_data_prc, by = c('STUSPS' = 'state_po')) %>% 
+    ggplot() +
+    geom_sf(aes(fill = !!as.name(fill_var))) +
+    theme_bw() +
+    theme(legend.position = 'none') +
+    scale_fill_discrete_gradient(
+      limits = my_lims,
+      breaks = mybreaks, 
+      colors = mycols, 
+      bins = length(mycols),
+      guide = guide_colourbar(frame.colour = 'black', 
+                              ticks.colour = 'black',
+                              barwidth = 20)
+    )
+  
+  if (tooltips) {
+    p <- p + geom_sf_label_repel(aes(label = paste0(STUSPS, ': ', scales::percent(generic_dr_spread_tw, 0.01))))
+  }
+  
+  p
 }

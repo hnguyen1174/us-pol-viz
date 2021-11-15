@@ -1,0 +1,74 @@
+---
+title: "Exploration"
+---
+
+## 1. Load Packages and Data
+
+```{r load_packages}
+library(tidyverse)
+library(lubridate)
+library(here)
+library(tigris)
+library(sf)
+library(devtools)
+library(cowplot)
+library(ggthemes)
+library(ggsflabel)
+library(glue)
+
+devtools::load_all()
+```
+
+```{r get_data}
+congressional_votes_total <- get_congressional_vote_data()
+generic_ballot_data <- get_generic_ballot_data(congressional_votes_total)
+congressional_votes_total <- congressional_votes_total %>%
+  left_join(generic_ballot_data, by = c('year', 'state', 'state_po')) %>% 
+  mutate(dem_index = SPREAD_DR_TW - generic_dr_spread_tw)
+```
+
+## 2. Visualizing House Results from 1976 to 2020 by States
+
+```{r fig.height = 27, fig.width = 10}
+p <- plots_two_party_spreads(congressional_votes_total, 'Oregon', tooltips = FALSE)
+p <- p +
+  theme(text = element_text(size = 7.5))
+print(p)
+ggsave(file.path(here::here(), 'fig/WV_congressional_changes.jpg'), p, width = 10, height = 27, dpi = 400)
+```
+
+```{r fig.height = 7, fig.width = 9}
+p <- plot_vote_shares(congressional_votes_total, 'New York')
+p <- p +
+  theme(text = element_text(size = 7.5))
+print(p)
+ggsave(file.path(here::here(), 'fig/NY_congressional_DR_shares.png'), p, width = 9, height = 7, dpi = 400)
+```
+
+## 3. Dem Index (How democratic the certain congressional district is relative to the state).
+
+```{r fig.height = 27, fig.width = 10}
+p <- plots_two_party_spreads(congressional_votes_total, 'Indiana', tooltips = FALSE, fill_var = 'dem_index')
+p <- p +
+  theme(text = element_text(size = 7.5))
+print(p)
+ggsave(file.path(here::here(), 'fig/IN_dem_index.jpg'), p, width = 10, height = 27, dpi = 400)
+```
+
+## 4. Generic Ballot By States
+
+```{r fig.height = 27, fig.width = 10}
+# Western, Midwest, Northeast, Southern, South Atlantic
+start_year <- 1976
+end_year <- 2020
+years <- seq(start_year, end_year, 2)
+plots <- map(years, get_two_party_genericbal_plots, generic_ballot_data, 'Midwest')
+
+p <- plot_grid(plotlist = plots,
+               labels = years,
+               ncol = 3)
+
+print(p)
+ggsave(file.path(here::here(), 'fig/midwest_generic_ballot.jpg'), p, width = 10, height = 27, dpi = 400)
+```
+
