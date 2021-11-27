@@ -2,17 +2,100 @@
 title: "Census Data"
 ---
 
-This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+```{r load_packages}
+library(tidyverse)
+library(lubridate)
+library(here)
+library(tigris)
+library(sf)
+library(devtools)
+library(cowplot)
+library(ggthemes)
+library(ggsflabel)
+library(glue)
+library(tidycensus)
 
-Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
-
-```{r}
-plot(cars)
+devtools::load_all()
 ```
 
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+```{r}
+census_api_key(
+  readRDS(file.path(here::here(), 'data/census_api_key.rds')), 
+install = TRUE,
+overwrite = TRUE)
+```
 
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
+```{r}
+options(tigris_use_cache = TRUE)
 
-The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+ny <- get_acs(geography = "tract", 
+              variables = "B19013_001", 
+              state = "NY", 
+              county = "New York", 
+              geometry = TRUE)
+
+ggplot(ny, aes(fill = estimate)) + 
+  geom_sf() + 
+  theme_void() + 
+  scale_fill_viridis_c(labels = scales::dollar)
+```
+
+```{r}
+racevars <- c(White = "P005003", 
+              Black = "P005004", 
+              Asian = "P005006", 
+              Hispanic = "P004003")
+
+harris <- get_decennial(geography = "tract", variables = racevars, 
+                  state = "TX", county = "Harris County", geometry = TRUE,
+                  summary_var = "P001001") 
+
+harris %>%
+  mutate(pct = 100 * (value / summary_value)) %>%
+  ggplot(aes(fill = pct)) +
+  facet_wrap(~variable) +
+  geom_sf(color = NA) +
+  # coord_sf(crs = 26915) + # Appropriate CRS for Houston, but may not be for your data
+  scale_fill_viridis_c()
+```
+
+```{r}
+ny <- get_acs(geography = "tract", 
+              variables = "B19013_001", 
+              state = "NY", 
+              county = c("New York", "Bronx", "Kings", "Queens", "Richmond"), 
+              geometry = TRUE)
+```
+
+```{r fig.height = 6, fig.width = 6}
+ggplot(ny, aes(fill = estimate)) + 
+  geom_sf() + 
+  theme_void() + 
+  scale_fill_viridis_c(labels = scales::dollar)
+```
+
+```{r}
+ny <- get_decennial(geography = "tract", variables = racevars, 
+                  state = "NY", 
+                  county = c("New York", "Bronx", "Kings", "Queens", "Richmond"), 
+                  geometry = TRUE,
+                  summary_var = "P001001") 
+```
+
+```{r fig.height = 6, fig.width = 6}
+ny %>%
+  mutate(pct = 100 * (value / summary_value)) %>%
+  ggplot(aes(fill = pct)) +
+  facet_wrap(~variable) +
+  geom_sf(color = NA) +
+  scale_fill_viridis_c() +
+  theme_hc()
+```
+
+
+
+
+
+
+
 

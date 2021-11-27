@@ -1,11 +1,11 @@
-Package: USHouseViz
-Title: Visualizing Political Party Strengths by Year by Congressional Districts
+Package: USPolViz
+Title: Visualizing US Election Results
 Version: 0.1
 Authors@R:
   person(given = "Gary Nguyen",
          role = c("aut", "cre"),
          email = "gary.hnguyen.1107@gmail.com")
-Description: This repo contains codes for congressional district data visualization
+Description: This repo contains codes to visualize US Election results
 License: MIT + file LICENSE
 Imports:
   dplyr,
